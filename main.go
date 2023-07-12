@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
@@ -19,14 +20,18 @@ func main() {
 	PrintHead()
 
 	read := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter your zipcode to receive your weather report")
-	zipcode, err := read.ReadString('\n')
+	fmt.Println("Enter your country abbrevation followed by a comma and then the city")
+	input, err := read.ReadString('\n')
+	fmt.Println(input)
 
 	if err != nil {
-		fmt.Println("Cannot read in zipcode")
+		fmt.Println("Cannot read in country abbrevation and city")
 	}
 
-	weather := GetReport(zipcode)
+	inputSlice := strings.Split(input, ",")
+	fmt.Println(inputSlice)
+
+	weather := GetReport(input)
 	fmt.Printf("The temp in %s is %s %s and %s.", weather.Location, weather.Temp, weather.Scale, weather.Condition)
 }
 
@@ -36,7 +41,7 @@ func PrintHead() {
 }
 
 func GetReport(zipcode string) WeatherReport {
-	url := fmt.Sprintf("https://www.wunderground.com/weather-forecast/%s", zipcode)
+	//url := fmt.Sprintf("https://www.wunderground.com/weather/%s/%s")
 	rep := WeatherReport{}
 	c := colly.NewCollector()
 
@@ -60,6 +65,6 @@ func GetReport(zipcode string) WeatherReport {
 		rep.Scale = e.Text
 	})
 
-	c.Visit(url)
+	//c.Visit(url)
 	return rep
 }
