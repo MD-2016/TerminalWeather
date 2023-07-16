@@ -21,7 +21,9 @@ func main() {
 
 	read := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter your country abbrevation followed by a comma and then the city")
+	fmt.Println("If US based city, please enter country abbrevation followed by a comma and then US State then comma US City")
 	input, err := read.ReadString('\n')
+	input = strings.ToLower(input)
 	fmt.Println(input)
 
 	if err != nil {
@@ -33,7 +35,7 @@ func main() {
 
 	//testStrings()
 
-	weather := GetReport(inputSlice)
+	weather := FormatReport(inputSlice)
 	fmt.Printf("The temp in %s is %s and %s.", weather.Location, weather.Temp, weather.Condition)
 }
 
@@ -42,10 +44,26 @@ func PrintHead() {
 
 }
 
-func GetReport(input []string) WeatherReport {
-	countryAbbrev := input[0]
+func FormatReport(input []string) WeatherReport {
+	countryAbbrev := ""
 	fmt.Println(countryAbbrev)
-	city := input[1]
+	city := ""
+	rep := WeatherReport{}
+	var state string
+	if len(input) == 3 {
+		// includes a us state
+		countryAbbrev = input[0]
+		state = input[1]
+		city = input[2]
+		res := GetUSCity(state)
+
+	} else if len(input) == 2 {
+
+	}
+	return rep
+}
+
+func GetReport() {
 	city = strings.TrimSpace(city)
 	cityByte := []byte(city)
 	//fmt.Println(city)
@@ -60,7 +78,6 @@ func GetReport(input []string) WeatherReport {
 		formattedCityString = strings.Join(citySlice, "-")
 	}
 	url := fmt.Sprintf("https://www.wunderground.com/weather/%s/%s", countryAbbrev, formattedCityString)
-	rep := WeatherReport{}
 	c := colly.NewCollector()
 
 	c.OnError(func(_ *colly.Response, err error) {
@@ -83,7 +100,132 @@ func GetReport(input []string) WeatherReport {
 	})
 
 	c.Visit(url)
-	return rep
+}
+
+func GetUSCity(city string) string {
+	usCityMatch := ""
+
+	switch city {
+	case "al":
+		usCityMatch = "al"
+	case "ak":
+		usCityMatch = "ak"
+	case "az":
+		usCityMatch = "az"
+	case "ar":
+		usCityMatch = "ar"
+	case "as":
+		usCityMatch = "as"
+	case "ca":
+		usCityMatch = "ca"
+	case "co":
+		usCityMatch = "co"
+	case "ct":
+		usCityMatch = "ct"
+	case "de":
+		usCityMatch = "de"
+	case "dc":
+		usCityMatch = "dc"
+	case "fl":
+		usCityMatch = "fl"
+	case "ga":
+		usCityMatch = "ga"
+	case "gu":
+		usCityMatch = "gu"
+	case "hi":
+		usCityMatch = "hi"
+	case "id":
+		usCityMatch = "id"
+	case "il":
+		usCityMatch = "il"
+	case "in":
+		usCityMatch = "in"
+	case "ia":
+		usCityMatch = "ia"
+	case "ks":
+		usCityMatch = "ks"
+	case "ky":
+		usCityMatch = "ky"
+	case "la":
+		usCityMatch = "la"
+	case "me":
+		usCityMatch = "me"
+	case "md":
+		usCityMatch = "md"
+	case "ma":
+		usCityMatch = "ma"
+	case "mi":
+		usCityMatch = "mi"
+	case "mn":
+		usCityMatch = "mn"
+	case "ms":
+		usCityMatch = "ms"
+	case "mo":
+		usCityMatch = "mo"
+	case "mt":
+		usCityMatch = "mt"
+	case "ne":
+		usCityMatch = "ne"
+	case "nv":
+		usCityMatch = "nv"
+	case "nh":
+		usCityMatch = "nh"
+	case "nj":
+		usCityMatch = "nj"
+	case "nm":
+		usCityMatch = "nm"
+	case "ny":
+		usCityMatch = "ny"
+	case "nc":
+		usCityMatch = "nc"
+	case "nd":
+		usCityMatch = "nd"
+	case "mp":
+		usCityMatch = "mp"
+	case "oh":
+		usCityMatch = "oh"
+	case "ok":
+		usCityMatch = "ok"
+	case "or":
+		usCityMatch = "or"
+	case "pa":
+		usCityMatch = "pa"
+	case "pr":
+		usCityMatch = "pr"
+	case "ri":
+		usCityMatch = "ri"
+	case "sc":
+		usCityMatch = "sc"
+	case "sd":
+		usCityMatch = "sd"
+	case "tn":
+		usCityMatch = "tn"
+	case "tx":
+		usCityMatch = "tx"
+	case "tt":
+		usCityMatch = "tt"
+	case "ut":
+		usCityMatch = "ut"
+	case "vt":
+		usCityMatch = "vt"
+	case "va":
+		usCityMatch = "va"
+	case "vi":
+		usCityMatch = "vi"
+	case "wa":
+		usCityMatch = "wa"
+	case "wv":
+		usCityMatch = "wv"
+	case "wi":
+		usCityMatch = "wi"
+	case "wy":
+		usCityMatch = "wy"
+	default:
+		usCityMatch = ""
+		fmt.Println("Error: not a US City")
+	}
+
+	return usCityMatch
 }
 
 /*
@@ -97,6 +239,3 @@ func testStrings() {
 
 }
 */
-
-
-func 
