@@ -21,10 +21,10 @@ func main() {
 
 	read := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter your country abbrevation followed by a comma and then the city")
-	fmt.Println("If US based city, please enter country abbrevation followed by a comma and then US State then comma US City")
+	fmt.Println("If US based city, please enter country abbrevation followed by a comma and then US State abbrevation then comma US City")
 	input, err := read.ReadString('\n')
 	input = strings.ToLower(input)
-	fmt.Println(input)
+	//fmt.Println(input)
 
 	if err != nil {
 		fmt.Println("Cannot read in country abbrevation and city")
@@ -35,8 +35,14 @@ func main() {
 
 	//testStrings()
 
-	weather := FormatReport(inputSlice)
-	fmt.Printf("The temp in %s is %s and %s.", weather.Location, weather.Temp, weather.Condition)
+	countryAbbrev, state, city := FormatReport(inputSlice)
+	if countryAbbrev == "" && city == "" {
+		fmt.Println("Cannot process request due to invalid input")
+	} else {
+		weather := GetReport(countryAbbrev, state, city)
+		fmt.Printf("The temp in %s is %s and conditions are %s", weather.Location, weather.Temp, weather.Condition)
+	}
+
 }
 
 func PrintHead() {
@@ -44,40 +50,69 @@ func PrintHead() {
 
 }
 
-func FormatReport(input []string) WeatherReport {
+func FormatReport(input []string) (string, string, string) {
 	countryAbbrev := ""
 	fmt.Println(countryAbbrev)
 	city := ""
-	rep := WeatherReport{}
 	var state string
+	var formattedCityString string
+	var citySlice []string
+	var cityByte []byte
+	countryAbbrev = input[0]
 	if len(input) == 3 {
 		// includes a us state
-		countryAbbrev = input[0]
-		state = input[1]
 		city = input[2]
-		res := GetUSCity(state)
+		state = GetUSCity(input[1])
 
+		if state == "" {
+			fmt.Println("Error: state cannot be blank")
+			return "", "", ""
+		}
+
+		city = strings.TrimSpace(city)
+		cityByte = []byte(city)
+		//fmt.Println(city)
+		matched, err := regexp.Match("[A-Za-z]", cityByte)
+		if err != nil {
+			fmt.Println("The string doesn't match")
+			return "", "", ""
+		}
+		if matched {
+			citySlice = strings.Split(city, " ")
+			formattedCityString = strings.Join(citySlice, "-")
+		}
+
+		return countryAbbrev, state, formattedCityString
 	} else if len(input) == 2 {
-
+		city = input[1]
+		state = ""
+		city = strings.TrimSpace(city)
+		cityByte = []byte(city)
+		//fmt.Println(city)
+		matched, err := regexp.Match("[A-Za-z]", cityByte)
+		if err != nil {
+			fmt.Println("The string doesn't match")
+		}
+		if matched {
+			citySlice = strings.Split(city, " ")
+			formattedCityString = strings.Join(citySlice, "-")
+		}
+		return countryAbbrev, "", formattedCityString
+	} else {
+		fmt.Println("Error: must have a country abbrev, city or country abbrev, us state abbrev, and us city.")
+		return "", "", ""
 	}
-	return rep
+
 }
 
-func GetReport() {
-	city = strings.TrimSpace(city)
-	cityByte := []byte(city)
-	//fmt.Println(city)
-	matched, err := regexp.Match("[^A-Za-z]", cityByte)
-	formattedCityString := ""
-	var citySlice []string
-	if err != nil {
-		fmt.Println("The string doesn't match")
+func GetReport(country string, state string, city string) WeatherReport {
+	rep := WeatherReport{}
+	url := ""
+	if state != "" {
+		url = fmt.Sprintf("https://www.wunderground.com/weather/%s/%s/%s", country, state, city)
+	} else {
+		url = fmt.Sprintf("https://www.wunderground.com/weather/%s/%s", country, city)
 	}
-	if matched {
-		citySlice = strings.Split(city, " ")
-		formattedCityString = strings.Join(citySlice, "-")
-	}
-	url := fmt.Sprintf("https://www.wunderground.com/weather/%s/%s", countryAbbrev, formattedCityString)
 	c := colly.NewCollector()
 
 	c.OnError(func(_ *colly.Response, err error) {
@@ -100,6 +135,7 @@ func GetReport() {
 	})
 
 	c.Visit(url)
+	return rep
 }
 
 func GetUSCity(city string) string {
