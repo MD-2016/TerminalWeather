@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -41,12 +42,12 @@ func main() {
 		fmt.Println("Cannot process request due to invalid input")
 	} else {
 		weather := GetReport(countryAbbrev, state, city)
-		temp, err := strconv.ParseFloat(weather.Temp, 32)
+		temp, err := strconv.ParseFloat(weather.Temp, 64)
 		if err != nil {
 			fmt.Println("error processing temp to celsius")
 		}
 		celsius := GetCelsiusTemp(temp)
-		fmt.Printf("The temp in %s is %s° F or %d° C and conditions are %s", weather.Location, weather.Temp, celsius, weather.Condition)
+		fmt.Printf("The temp in %s is %s° F or %d° C and conditions are %s\n", weather.Location, weather.Temp, celsius, weather.Condition)
 	}
 
 }
@@ -286,7 +287,7 @@ func GetUSCity(city string) string {
 
 func GetCelsiusTemp(temp float64) int {
 
-	celsius := (temp - 32) * (0.555555556)
+	celsius := math.Ceil((temp - 32) * (5.0 / 9.0))
 	return int(celsius)
 }
 
