@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -40,7 +41,12 @@ func main() {
 		fmt.Println("Cannot process request due to invalid input")
 	} else {
 		weather := GetReport(countryAbbrev, state, city)
-		fmt.Printf("The temp in %s is %s and conditions are %s", weather.Location, weather.Temp, weather.Condition)
+		temp, err := strconv.ParseFloat(weather.Temp, 32)
+		if err != nil {
+			fmt.Println("error processing temp to celsius")
+		}
+		celsius := GetCelsiusTemp(temp)
+		fmt.Printf("The temp in %s is %s° F or %d° C and conditions are %s", weather.Location, weather.Temp, celsius, weather.Condition)
 	}
 
 }
@@ -52,12 +58,9 @@ func PrintHead() {
 
 func FormatReport(input []string) (string, string, string) {
 	countryAbbrev := ""
-	fmt.Println(countryAbbrev)
 	city := ""
 	var state string
 	var formattedCityString string
-	var citySlice []string
-	var cityByte []byte
 	countryAbbrev = input[0]
 	if len(input) == 3 {
 		// includes a us state
@@ -70,16 +73,25 @@ func FormatReport(input []string) (string, string, string) {
 		}
 
 		city = strings.TrimSpace(city)
-		cityByte = []byte(city)
 		//fmt.Println(city)
-		matched, err := regexp.Match("[A-Za-z]", cityByte)
+		matched, err := regexp.MatchString("[A-Za-z]+", city)
 		if err != nil {
 			fmt.Println("The string doesn't match")
 			return "", "", ""
 		}
 		if matched {
-			citySlice = strings.Split(city, " ")
-			formattedCityString = strings.Join(citySlice, "-")
+
+			//check for more than one word
+			morethanOne, err := regexp.MatchString("\\s+", city)
+			if err != nil {
+				fmt.Println("The string is errored")
+				return "", "", ""
+			}
+			if morethanOne {
+				formattedCityString = strings.ReplaceAll(city, " ", "-")
+			} else {
+				formattedCityString = city
+			}
 		}
 
 		return countryAbbrev, state, formattedCityString
@@ -87,15 +99,23 @@ func FormatReport(input []string) (string, string, string) {
 		city = input[1]
 		state = ""
 		city = strings.TrimSpace(city)
-		cityByte = []byte(city)
 		//fmt.Println(city)
-		matched, err := regexp.Match("[A-Za-z]", cityByte)
+		matched, err := regexp.MatchString("[A-Za-z]+", city)
 		if err != nil {
 			fmt.Println("The string doesn't match")
 		}
 		if matched {
-			citySlice = strings.Split(city, " ")
-			formattedCityString = strings.Join(citySlice, "-")
+			//check for more than one word
+			morethanOne, err := regexp.MatchString("\\s+", city)
+			if err != nil {
+				fmt.Println("The string is errored")
+				return "", "", ""
+			}
+			if morethanOne {
+				formattedCityString = strings.ReplaceAll(city, " ", "-")
+			} else {
+				formattedCityString = city
+			}
 		}
 		return countryAbbrev, "", formattedCityString
 	} else {
@@ -262,6 +282,12 @@ func GetUSCity(city string) string {
 	}
 
 	return usCityMatch
+}
+
+func GetCelsiusTemp(temp float64) int {
+
+	celsius := (temp - 32) * (0.555555556)
+	return int(celsius)
 }
 
 /*
