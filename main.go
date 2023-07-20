@@ -279,7 +279,7 @@ func GetUSCity(city string) string {
 		usCityMatch = "wy"
 	default:
 		usCityMatch = ""
-		fmt.Println("Error: not a US City")
+		fmt.Println("Error: not a US State")
 	}
 
 	return usCityMatch
