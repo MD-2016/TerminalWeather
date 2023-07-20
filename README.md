@@ -46,8 +46,7 @@ Please keep in mind that proper format in either case is as follows `[country ab
 - [ ] Convert the temperature result from Fahrenheit to Celsius and display
 
 ## Findings
-One finding during this project so far was the issue of not every city being recognized. After searching on the site myself for the reason, it seems the data comes from weather stations that not every city has or has register to the site. This means you need an alternative way of getting weather for your city. The trick I found is to look up the airport code for the closest airport and substitute that for the respective city.
-
+One finding during this project so far was the issue of not every city being recognized. After searching on the site myself for the reason, it seems the data comes from weather stations that not every city has or has register to the site. This means you need an alternative way of getting weather for your city. This means you may need to research the city for the closest PWS.
 ## Reported Errors
 ## Conclusions
 This project was fun and it was a good introduction to web scraping with the go programming language. Helped understand a bit more about how the go language works and how to use it for web scraping. 
