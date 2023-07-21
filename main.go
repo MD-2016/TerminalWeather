@@ -26,17 +26,12 @@ func main() {
 	fmt.Println("If US based city, please enter country abbrevation followed by a comma and then US State abbrevation then comma US City")
 	input, err := read.ReadString('\n')
 	input = strings.ToLower(input)
-	//fmt.Println(input)
 
 	if err != nil {
-		fmt.Println("Cannot read in country abbrevation and city")
+		fmt.Println("Cannot read in input")
 	}
 
 	inputSlice := strings.Split(input, ",")
-	//fmt.Println(inputSlice)
-
-	//testStrings()
-
 	countryAbbrev, state, city := FormatReport(inputSlice)
 	if countryAbbrev == "" && city == "" {
 		fmt.Println("Cannot process request due to invalid input")
@@ -57,6 +52,69 @@ func PrintHead() {
 
 }
 
+func FormatReport(input []string) (string, string, string) {
+	countryAbbrev := ""
+	city := ""
+	state := ""
+
+	if len(input) != 2 && len(input) != 3 {
+		fmt.Println("Error: must have a country abbrev, city or if us a us state abbrev and us city")
+		return "", "", ""
+	}
+
+	if len(input) == 3 {
+		countryAbbrev = input[0]
+		state = input[1]
+		city = input[2]
+		countryAbbrev, state, city = FormatUSCityString(countryAbbrev, state, city)
+		return countryAbbrev, state, city
+	}
+
+	if len(input) == 2 {
+		countryAbbrev = input[0]
+		city = input[1]
+		countryAbbrev, city = FormatCountryCityString(countryAbbrev, city)
+		return countryAbbrev, "", city
+	}
+
+	return "", "", ""
+
+}
+
+func FormatCountryCityString(country string, city string) (string, string) {
+	re, _ := regexp.Compile("[A-Za-z]+")
+	country = strings.TrimSpace(country)
+	city = strings.TrimSpace(city)
+
+	if re.MatchString(country) && re.MatchString(city) {
+		city = strings.ReplaceAll(city, " ", "-")
+		return country, city
+	} else {
+		return "", ""
+	}
+}
+
+func FormatUSCityString(country string, state string, city string) (string, string, string) {
+	re, _ := regexp.Compile("[A-Za-z]+")
+	country = strings.TrimSpace(country)
+	city = strings.TrimSpace(city)
+	state = strings.TrimSpace(state)
+
+	if re.MatchString(country) && re.MatchString(city) && re.MatchString(state) {
+		state = GetUSCity(state)
+		if state == "" {
+			fmt.Println("State cannot be blank")
+			return "", "", ""
+		} else {
+			city = strings.ReplaceAll(city, " ", "-")
+			return country, state, city
+		}
+	} else {
+		return "", "", ""
+	}
+}
+
+/*
 func FormatReport(input []string) (string, string, string) {
 	countryAbbrev := ""
 	city := ""
@@ -125,6 +183,7 @@ func FormatReport(input []string) (string, string, string) {
 	}
 
 }
+*/
 
 func GetReport(country string, state string, city string) WeatherReport {
 	rep := WeatherReport{}
@@ -159,6 +218,21 @@ func GetReport(country string, state string, city string) WeatherReport {
 	return rep
 }
 
+func GetUSCity(city string) string {
+	states := []string{"al", "ak", "az", "ar", "ca", "co", "ct", "de", "fl", "ga", "hi", "id", "il", "in", "ia", "ks", "ky", "la", "me", "md", "ma", "mi", "mn", "ms", "mo", "mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or", "pa", "ri", "sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wi", "wv", "wy", "as", "dc", "gu", "mp", "pr", "vi"}
+
+	for _, state := range states {
+		if state == city {
+			return city
+		}
+	}
+
+	fmt.Println("State does not match")
+	return ""
+
+}
+
+/*
 func GetUSCity(city string) string {
 	usCityMatch := ""
 
@@ -284,6 +358,7 @@ func GetUSCity(city string) string {
 
 	return usCityMatch
 }
+*/
 
 func GetCelsiusTemp(temp float64) int {
 
