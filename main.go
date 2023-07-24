@@ -57,11 +57,6 @@ func FormatReport(input []string) (string, string, string) {
 	city := ""
 	state := ""
 
-	if len(input) != 2 && len(input) != 3 {
-		fmt.Println("Error: must have a country abbrev, city or if us a us state abbrev and us city")
-		return "", "", ""
-	}
-
 	if len(input) == 3 {
 		countryAbbrev = input[0]
 		state = input[1]
@@ -72,13 +67,18 @@ func FormatReport(input []string) (string, string, string) {
 
 	if len(input) == 2 {
 		countryAbbrev = input[0]
-		fmt.Println(countryAbbrev)
+		if countryAbbrev == "us" {
+			fmt.Println("US requires 3 inputs")
+			countryAbbrev = ""
+			return countryAbbrev, state, city
+		}
 		city = input[1]
 		countryAbbrev, city = FormatCountryCityString(countryAbbrev, city)
-		return countryAbbrev, "", city
+		return countryAbbrev, state, city
 	}
 
-	return "", "", ""
+	fmt.Println("Error: must have a country abbrev, city or if us a us state abbrev and us city")
+	return countryAbbrev, city, state
 
 }
 
@@ -92,9 +92,8 @@ func FormatCountryCityString(country string, city string) (string, string) {
 		city = strings.ReplaceAll(city, " ", "-")
 		return country, city
 	} else {
-		fmt.Println(country)
-		fmt.Println(city)
-		return "", ""
+		country = ""
+		return country, city
 	}
 }
 
@@ -109,13 +108,15 @@ func FormatUSCityString(country string, state string, city string) (string, stri
 		state = GetUSCity(state)
 		if state == "" {
 			fmt.Println("State cannot be blank")
-			return "", "", ""
+			country = ""
+			return country, state, city
 		} else {
 			city = strings.ReplaceAll(city, " ", "-")
 			return country, state, city
 		}
 	} else {
-		return "", "", ""
+		country = ""
+		return country, state, city
 	}
 }
 
@@ -162,7 +163,8 @@ func GetUSCity(city string) string {
 	}
 
 	fmt.Println("State does not match")
-	return ""
+	city = ""
+	return city
 
 }
 
@@ -176,7 +178,8 @@ func CheckCountryAbbrev(country string) string {
 	}
 
 	fmt.Println("Country doesn't match the two letter abbrevation for countries in the world")
-	return ""
+	country = ""
+	return country
 }
 
 func GetCelsiusTemp(temp float64) int {
