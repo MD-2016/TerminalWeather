@@ -25,7 +25,7 @@ A terminal application where you can request weather for an area of choice. This
 
 Please keep in mind that proper format in either case is as follows `[country abbrevation],[city]` or `[country abbrevation],[US state abbrevation],[US city]` as in the above example screenshots.
 
-*NOTE*: It is possible that you get incorrect data or no data at all because the city of interest doesn't actually exist on their site. This mean that the weather station isn't online or the respective city doesn't have an active weather station (this site gets data from weather stations). This means you may need to research your city of interest by looking for an active PWS or Personal Weather Station on their site. Unfortunately, this is an issue that cannot be resolved currently.   
+*NOTE*: It is possible that you get incorrect data or no data at all because the city of interest doesn't actually exist on their site. This mean that the weather station isn't online or the respective city doesn't have an active weather station (this site gets data from weather stations). This means you may need to research your city of interest by looking for an active PWS or Personal Weather Station on their site. Unfortunately, this is an issue that cannot be resolved currently. It is also possible that timeouts occur.  
 
 7. You get weather reported to the screen in both fahrenheit and celsius and the program ends.
 

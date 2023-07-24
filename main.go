@@ -72,6 +72,7 @@ func FormatReport(input []string) (string, string, string) {
 
 	if len(input) == 2 {
 		countryAbbrev = input[0]
+		fmt.Println(countryAbbrev)
 		city = input[1]
 		countryAbbrev, city = FormatCountryCityString(countryAbbrev, city)
 		return countryAbbrev, "", city
@@ -84,12 +85,15 @@ func FormatReport(input []string) (string, string, string) {
 func FormatCountryCityString(country string, city string) (string, string) {
 	re, _ := regexp.Compile("[A-Za-z]+")
 	country = strings.TrimSpace(country)
+	country = CheckCountryAbbrev(country)
 	city = strings.TrimSpace(city)
 
 	if re.MatchString(country) && re.MatchString(city) {
 		city = strings.ReplaceAll(city, " ", "-")
 		return country, city
 	} else {
+		fmt.Println(country)
+		fmt.Println(city)
 		return "", ""
 	}
 }
@@ -97,6 +101,7 @@ func FormatCountryCityString(country string, city string) (string, string) {
 func FormatUSCityString(country string, state string, city string) (string, string, string) {
 	re, _ := regexp.Compile("[A-Za-z]+")
 	country = strings.TrimSpace(country)
+	country = CheckCountryAbbrev(country)
 	city = strings.TrimSpace(city)
 	state = strings.TrimSpace(state)
 
@@ -113,77 +118,6 @@ func FormatUSCityString(country string, state string, city string) (string, stri
 		return "", "", ""
 	}
 }
-
-/*
-func FormatReport(input []string) (string, string, string) {
-	countryAbbrev := ""
-	city := ""
-	var state string
-	var formattedCityString string
-	countryAbbrev = input[0]
-	if len(input) == 3 {
-		// includes a us state
-		city = input[2]
-		state = GetUSCity(input[1])
-
-		if state == "" {
-			fmt.Println("Error: state cannot be blank")
-			return "", "", ""
-		}
-
-		city = strings.TrimSpace(city)
-		//fmt.Println(city)
-		matched, err := regexp.MatchString("[A-Za-z]+", city)
-		if err != nil {
-			fmt.Println("The string doesn't match")
-			return "", "", ""
-		}
-		if matched {
-
-			//check for more than one word
-			morethanOne, err := regexp.MatchString("\\s+", city)
-			if err != nil {
-				fmt.Println("The string is errored")
-				return "", "", ""
-			}
-			if morethanOne {
-				formattedCityString = strings.ReplaceAll(city, " ", "-")
-			} else {
-				formattedCityString = city
-			}
-		}
-
-		return countryAbbrev, state, formattedCityString
-	} else if len(input) == 2 {
-		city = input[1]
-		state = ""
-		city = strings.TrimSpace(city)
-		//fmt.Println(city)
-		matched, err := regexp.MatchString("[A-Za-z]+", city)
-		if err != nil {
-			fmt.Println("The string doesn't match")
-		}
-		if matched {
-			//check for more than one word
-			morethanOne, err := regexp.MatchString("\\s+", city)
-			if err != nil {
-				fmt.Println("The string is errored")
-				return "", "", ""
-			}
-			if morethanOne {
-				formattedCityString = strings.ReplaceAll(city, " ", "-")
-			} else {
-				formattedCityString = city
-			}
-		}
-		return countryAbbrev, "", formattedCityString
-	} else {
-		fmt.Println("Error: must have a country abbrev, city or country abbrev, us state abbrev, and us city.")
-		return "", "", ""
-	}
-
-}
-*/
 
 func GetReport(country string, state string, city string) WeatherReport {
 	rep := WeatherReport{}
@@ -232,148 +166,21 @@ func GetUSCity(city string) string {
 
 }
 
-/*
-func GetUSCity(city string) string {
-	usCityMatch := ""
+func CheckCountryAbbrev(country string) string {
+	countries := []string{"ad", "ae", "af", "ag", "ai", "al", "am", "ao", "aq", "ar", "as", "at", "au", "aw", "ax", "az", "ba", "bb", "bd", "be", "bf", "bg", "bh", "bi", "bj", "bl", "bm", "bn", "bo", "bq", "br", "bs", "bt", "bv", "bw", "by", "bz", "ca", "cc", "cd", "cf", "cg", "ch", "ci", "ck", "cl", "cm", "cn", "co", "cr", "cu", "cv", "cw", "cx", "cy", "cz", "de", "dj", "dk", "dm", "do", "dz", "ec", "ee", "eg", "eh", "er", "es", "et", "fi", "fj", "fk", "fm", "fo", "fr", "ga", "gb", "gd", "ge", "gf", "gg", "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr", "gs", "gt", "gu", "gw", "gy", "hk", "hm", "hn", "hr", "ht", "hu", "id", "ie", "il", "im", "in", "io", "iq", "ir", "is", "it", "je", "jm", "jo", "jp", "ke", "kg", "kh", "ki", "km", "kn", "kp", "kr", "kw", "ky", "kz", "la", "lb", "lc", "li", "lk", "lr", "ls", "lt", "lu", "lv", "ly", "ma", "mc", "md", "me", "mf", "mg", "mh", "mk", "ml", "mm", "mn", "mo", "mp", "mq", "mr", "ms", "mt", "mu", "mv", "mw", "mx", "my", "mz", "na", "nc", "ne", "nf", "ng", "ni", "nl", "no", "np", "nr", "nu", "nz", "om", "pa", "pe", "pf", "pg", "ph", "pk", "pl", "pm", "pn", "pr", "ps", "pt", "pw", "py", "qa", "re", "ro", "rs", "ru", "rw", "sa", "sb", "sc", "sd", "se", "sg", "sh", "si", "sj", "sk", "sl", "sm", "sn", "so", "sr", "ss", "st", "sv", "sx", "sy", "sz", "tc", "td", "tf", "tg", "th", "tj", "tk", "tl", "tm", "tn", "to", "tr", "tt", "tv", "tw", "tz", "ua", "ug", "um", "us", "uy", "uz", "va", "vc", "ve", "vg", "vi", "vn", "vu", "wf", "ws", "ye", "yt", "za", "zm", "zw"}
 
-	switch city {
-	case "al":
-		usCityMatch = "al"
-	case "ak":
-		usCityMatch = "ak"
-	case "az":
-		usCityMatch = "az"
-	case "ar":
-		usCityMatch = "ar"
-	case "as":
-		usCityMatch = "as"
-	case "ca":
-		usCityMatch = "ca"
-	case "co":
-		usCityMatch = "co"
-	case "ct":
-		usCityMatch = "ct"
-	case "de":
-		usCityMatch = "de"
-	case "dc":
-		usCityMatch = "dc"
-	case "fl":
-		usCityMatch = "fl"
-	case "ga":
-		usCityMatch = "ga"
-	case "gu":
-		usCityMatch = "gu"
-	case "hi":
-		usCityMatch = "hi"
-	case "id":
-		usCityMatch = "id"
-	case "il":
-		usCityMatch = "il"
-	case "in":
-		usCityMatch = "in"
-	case "ia":
-		usCityMatch = "ia"
-	case "ks":
-		usCityMatch = "ks"
-	case "ky":
-		usCityMatch = "ky"
-	case "la":
-		usCityMatch = "la"
-	case "me":
-		usCityMatch = "me"
-	case "md":
-		usCityMatch = "md"
-	case "ma":
-		usCityMatch = "ma"
-	case "mi":
-		usCityMatch = "mi"
-	case "mn":
-		usCityMatch = "mn"
-	case "ms":
-		usCityMatch = "ms"
-	case "mo":
-		usCityMatch = "mo"
-	case "mt":
-		usCityMatch = "mt"
-	case "ne":
-		usCityMatch = "ne"
-	case "nv":
-		usCityMatch = "nv"
-	case "nh":
-		usCityMatch = "nh"
-	case "nj":
-		usCityMatch = "nj"
-	case "nm":
-		usCityMatch = "nm"
-	case "ny":
-		usCityMatch = "ny"
-	case "nc":
-		usCityMatch = "nc"
-	case "nd":
-		usCityMatch = "nd"
-	case "mp":
-		usCityMatch = "mp"
-	case "oh":
-		usCityMatch = "oh"
-	case "ok":
-		usCityMatch = "ok"
-	case "or":
-		usCityMatch = "or"
-	case "pa":
-		usCityMatch = "pa"
-	case "pr":
-		usCityMatch = "pr"
-	case "ri":
-		usCityMatch = "ri"
-	case "sc":
-		usCityMatch = "sc"
-	case "sd":
-		usCityMatch = "sd"
-	case "tn":
-		usCityMatch = "tn"
-	case "tx":
-		usCityMatch = "tx"
-	case "tt":
-		usCityMatch = "tt"
-	case "ut":
-		usCityMatch = "ut"
-	case "vt":
-		usCityMatch = "vt"
-	case "va":
-		usCityMatch = "va"
-	case "vi":
-		usCityMatch = "vi"
-	case "wa":
-		usCityMatch = "wa"
-	case "wv":
-		usCityMatch = "wv"
-	case "wi":
-		usCityMatch = "wi"
-	case "wy":
-		usCityMatch = "wy"
-	default:
-		usCityMatch = ""
-		fmt.Println("Error: not a US State")
+	for _, selectedCountry := range countries {
+		if selectedCountry == country {
+			return country
+		}
 	}
 
-	return usCityMatch
+	fmt.Println("Country doesn't match the two letter abbrevation for countries in the world")
+	return ""
 }
-*/
 
 func GetCelsiusTemp(temp float64) int {
 
 	celsius := math.Ceil((temp - 32) * (5.0 / 9.0))
 	return int(celsius)
 }
-
-/*
-func testStrings() {
-	test := "New Delhi, Delhi, India Weather Conditions"
-	fmt.Println(test)
-	split := strings.Split(test, " Weather Conditions")
-	fmt.Println(split)
-	res := strings.Join(split, " ")
-	fmt.Println(res)
-
-}
-*/
