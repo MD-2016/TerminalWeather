@@ -37,6 +37,9 @@ func main() {
 		fmt.Println("Cannot process request due to invalid input")
 	} else {
 		weather := GetReport(countryAbbrev, state, city)
+		if weather.Location == "undefined" {
+			fmt.Println("The location either doesn't exist or the city unfortunately isn't support by the site.\n Check https://www.wunderground.com and search for a PWS (Personal Weather Station) for the city and see if that exists.")
+		}
 		temp, err := strconv.ParseFloat(weather.Temp, 64)
 		if err != nil {
 			fmt.Println("error processing temp to celsius")
