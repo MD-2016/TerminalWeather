@@ -38,7 +38,10 @@ func main() {
 	} else {
 		weather := GetReport(countryAbbrev, state, city)
 		if weather.Location == "undefined" {
-			fmt.Println("The location either doesn't exist or the city unfortunately isn't support by the site.\n Check https://www.wunderground.com and search for a PWS (Personal Weather Station) for the city and see if that exists.")
+			fmt.Println("The location either doesn't exist or the city unfortunately isn't" +
+				" supported by the site. \n Check https://www.wunderground.com and search for" +
+				"a PWS (Personal Weather Station) for the city and see if that exists.")
+			os.Exit(0)
 		}
 		temp, err := strconv.ParseFloat(weather.Temp, 64)
 		if err != nil {
@@ -127,9 +130,11 @@ func GetReport(country string, state string, city string) WeatherReport {
 	rep := WeatherReport{}
 	url := ""
 	if state != "" {
-		url = fmt.Sprintf("https://www.wunderground.com/weather/%s/%s/%s", country, state, city)
+		url = fmt.Sprintf("https://www.wunderground.com/weather/%s/%s/%s", country, state,
+			city)
 	} else {
-		url = fmt.Sprintf("https://www.wunderground.com/weather/%s/%s", country, city)
+		url = fmt.Sprintf("https://www.wunderground.com/weather/%s/%s", country,
+			city)
 	}
 	c := colly.NewCollector()
 
@@ -137,27 +142,33 @@ func GetReport(country string, state string, city string) WeatherReport {
 		fmt.Println("Error processing request", err)
 	})
 
-	c.OnHTML(".city-header > h1:nth-child(2) > span:nth-child(1)", func(e *colly.HTMLElement) {
+	c.OnHTML(".city-header > h1:nth-child(2) > span:nth-child(1)",
+		func(e *colly.HTMLElement) {
 
-		res := strings.Split(e.Text, " Weather Conditions")
-		//fmt.Println(res)
-		rep.Location = strings.Join(res, " ")
-	})
+			res := strings.Split(e.Text, " Weather Conditions")
+			//fmt.Println(res)
+			rep.Location = strings.Join(res, " ")
+		})
 
 	c.OnHTML(".condition-icon > p:nth-child(2)", func(e *colly.HTMLElement) {
 		rep.Condition = e.Text
 	})
 
-	c.OnHTML(".current-temp > lib-display-unit:nth-child(1) > span:nth-child(1) > span:nth-child(1)", func(e *colly.HTMLElement) {
-		rep.Temp = e.Text
-	})
+	c.OnHTML(".current-temp > lib-display-unit:nth-child(1) > span:nth-child(1) > span:nth-child(1)",
+		func(e *colly.HTMLElement) {
+			rep.Temp = e.Text
+		})
 
 	c.Visit(url)
 	return rep
 }
 
 func GetUSCity(city string) string {
-	states := []string{"al", "ak", "az", "ar", "ca", "co", "ct", "de", "fl", "ga", "hi", "id", "il", "in", "ia", "ks", "ky", "la", "me", "md", "ma", "mi", "mn", "ms", "mo", "mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or", "pa", "ri", "sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wi", "wv", "wy", "as", "dc", "gu", "mp", "pr", "vi"}
+	states := []string{"al", "ak", "az", "ar", "ca", "co", "ct", "de", "fl", "ga", "hi",
+		"id", "il", "in", "ia", "ks", "ky", "la", "me", "md", "ma", "mi", "mn", "ms", "mo",
+		"mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or", "pa", "ri",
+		"sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wi", "wv", "wy", "as", "dc", "gu",
+		"mp", "pr", "vi"}
 
 	for _, state := range states {
 		if state == city {
@@ -172,7 +183,25 @@ func GetUSCity(city string) string {
 }
 
 func CheckCountryAbbrev(country string) string {
-	countries := []string{"ad", "ae", "af", "ag", "ai", "al", "am", "ao", "aq", "ar", "as", "at", "au", "aw", "ax", "az", "ba", "bb", "bd", "be", "bf", "bg", "bh", "bi", "bj", "bl", "bm", "bn", "bo", "bq", "br", "bs", "bt", "bv", "bw", "by", "bz", "ca", "cc", "cd", "cf", "cg", "ch", "ci", "ck", "cl", "cm", "cn", "co", "cr", "cu", "cv", "cw", "cx", "cy", "cz", "de", "dj", "dk", "dm", "do", "dz", "ec", "ee", "eg", "eh", "er", "es", "et", "fi", "fj", "fk", "fm", "fo", "fr", "ga", "gb", "gd", "ge", "gf", "gg", "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr", "gs", "gt", "gu", "gw", "gy", "hk", "hm", "hn", "hr", "ht", "hu", "id", "ie", "il", "im", "in", "io", "iq", "ir", "is", "it", "je", "jm", "jo", "jp", "ke", "kg", "kh", "ki", "km", "kn", "kp", "kr", "kw", "ky", "kz", "la", "lb", "lc", "li", "lk", "lr", "ls", "lt", "lu", "lv", "ly", "ma", "mc", "md", "me", "mf", "mg", "mh", "mk", "ml", "mm", "mn", "mo", "mp", "mq", "mr", "ms", "mt", "mu", "mv", "mw", "mx", "my", "mz", "na", "nc", "ne", "nf", "ng", "ni", "nl", "no", "np", "nr", "nu", "nz", "om", "pa", "pe", "pf", "pg", "ph", "pk", "pl", "pm", "pn", "pr", "ps", "pt", "pw", "py", "qa", "re", "ro", "rs", "ru", "rw", "sa", "sb", "sc", "sd", "se", "sg", "sh", "si", "sj", "sk", "sl", "sm", "sn", "so", "sr", "ss", "st", "sv", "sx", "sy", "sz", "tc", "td", "tf", "tg", "th", "tj", "tk", "tl", "tm", "tn", "to", "tr", "tt", "tv", "tw", "tz", "ua", "ug", "um", "us", "uy", "uz", "va", "vc", "ve", "vg", "vi", "vn", "vu", "wf", "ws", "ye", "yt", "za", "zm", "zw"}
+	countries := []string{"ad", "ae", "af", "ag", "ai", "al", "am", "ao", "aq", "ar",
+		"as", "at", "au", "aw", "ax", "az", "ba", "bb", "bd", "be", "bf", "bg", "bh", "bi",
+		"bj", "bl", "bm", "bn", "bo", "bq", "br", "bs", "bt", "bv", "bw", "by", "bz", "ca",
+		"cc", "cd", "cf", "cg", "ch", "ci", "ck", "cl", "cm", "cn", "co", "cr", "cu", "cv",
+		"cw", "cx", "cy", "cz", "de", "dj", "dk", "dm", "do", "dz", "ec", "ee", "eg", "eh",
+		"er", "es", "et", "fi", "fj", "fk", "fm", "fo", "fr", "ga", "gb", "gd", "ge", "gf",
+		"gg", "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr", "gs", "gt", "gu", "gw", "gy",
+		"hk", "hm", "hn", "hr", "ht", "hu", "id", "ie", "il", "im", "in", "io", "iq", "ir",
+		"is", "it", "je", "jm", "jo", "jp", "ke", "kg", "kh", "ki", "km", "kn", "kp", "kr",
+		"kw", "ky", "kz", "la", "lb", "lc", "li", "lk", "lr", "ls", "lt", "lu", "lv", "ly",
+		"ma", "mc", "md", "me", "mf", "mg", "mh", "mk", "ml", "mm", "mn", "mo", "mp", "mq",
+		"mr", "ms", "mt", "mu", "mv", "mw", "mx", "my", "mz", "na", "nc", "ne", "nf", "ng",
+		"ni", "nl", "no", "np", "nr", "nu", "nz", "om", "pa", "pe", "pf", "pg", "ph", "pk",
+		"pl", "pm", "pn", "pr", "ps", "pt", "pw", "py", "qa", "re", "ro", "rs", "ru", "rw",
+		"sa", "sb", "sc", "sd", "se", "sg", "sh", "si", "sj", "sk", "sl", "sm", "sn", "so",
+		"sr", "ss", "st", "sv", "sx", "sy", "sz", "tc", "td", "tf", "tg", "th", "tj", "tk",
+		"tl", "tm", "tn", "to", "tr", "tt", "tv", "tw", "tz", "ua", "ug", "um", "us", "uy",
+		"uz", "va", "vc", "ve", "vg", "vi", "vn", "vu", "wf", "ws", "ye", "yt", "za", "zm",
+		"zw"}
 
 	for _, selectedCountry := range countries {
 		if selectedCountry == country {
@@ -180,7 +209,8 @@ func CheckCountryAbbrev(country string) string {
 		}
 	}
 
-	fmt.Println("Country doesn't match the two letter abbrevation for countries in the world")
+	fmt.Println(
+		"Country doesn't match the two letter abbrevation for countries in the world")
 	country = ""
 	return country
 }
