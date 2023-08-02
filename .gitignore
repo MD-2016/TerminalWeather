@@ -18,6 +18,7 @@
 # vendor/
 
 .vscode
+test.go
 
 # Go workspace file
 go.work
