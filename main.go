@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	re, _ := regexp.Compile("^[A-Za-z]+$")
+	re, _ := regexp.Compile("[A-Za-z,]+")
 	if inputValid := re.MatchString(input); !inputValid {
 		panic("Input must only contain letters")
 	}

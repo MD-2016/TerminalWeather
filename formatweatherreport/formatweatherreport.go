@@ -18,7 +18,7 @@ func ValidateInput(data ReportData) error {
 	}
 
 	if data.CountryAbbrev == "us" {
-		err := GetUSCity(data.City)
+		err := GetUSCity(data.State)
 		if err != nil {
 			return err
 		}
